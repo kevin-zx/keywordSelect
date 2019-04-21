@@ -1,19 +1,35 @@
 package main
 
 import (
+	"encoding/csv"
 	"fmt"
 	"github.com/kevin-zx/baiduApiSDK/apiUtil"
 	"github.com/kevin-zx/baiduApiSDK/baiduSDK"
 	"github.com/kevin-zx/seotools/comm/baidu"
 	"github.com/kevin-zx/seotools/comm/site_base"
+	"github.com/kevin-zx/seotools/comm/urlhandler"
 	"jinzhunassist/domain"
 	"net/url"
 	"strings"
 )
 
 var keywordCount map[string]int
+var csis map[string]CatSiteInfo
+var csvW *csv.Writer
+var keywordSearchCount map[string]int
+
+type CatSiteInfo struct {
+	SearchKeyword string
+	SiteDomain    string
+	SiteUrl       string
+	SitePageInfo  site_base.WebPageSeoInfo
+	SeoInfo5118   domain.SeoInfo
+	Keywords      []string
+}
 
 func main() {
+	csis = make(map[string]CatSiteInfo)
+	keywordSearchCount = make(map[string]int)
 	rootWords := []string{"苏州房产"}
 	websites, err := GetMainWebByWords(rootWords)
 	if err != nil {
@@ -37,6 +53,12 @@ func main() {
 		allKeywords = append(allKeywords, fck.Word)
 	}
 	countKeyword(allKeywords)
+	topKeywordsMap := SelectTopKeywords(100)
+	var topKeywords []string
+	for k := range topKeywordsMap {
+		topKeywords = append(topKeywords, k)
+	}
+	run(topKeywords)
 
 	for k, c := range keywordCount {
 		fmt.Println(k, "----------", c)
@@ -181,4 +203,68 @@ func SelectTopKeywords(i int) map[string]int {
 
 	}
 	return keywords
+}
+
+func run(keywords []string) []string {
+	var sKeywords []string
+	l := len(keywords)
+	for i, k := range keywords {
+		if _, ok := keywordSearchCount[k]; ok {
+			continue
+		}
+		fmt.Printf("%d/%d\n", i, l)
+		keywordSearchCount[k] = 1
+		bmrs, err := baidu.GetBaiduPcResultsByKeyword(k, 1, 10)
+		if err != nil {
+			panic(err)
+		}
+		for _, bmr := range *bmrs {
+			if bmr.RealUrl == "" {
+				_ = bmr.GetPCRealUrl()
+			}
+			if bmr.RealUrl != "" && !strings.Contains(bmr.RealUrl, "baidu") {
+				sdomain, err := urlhandler.GetDomain(bmr.RealUrl)
+				if err != nil {
+					fmt.Printf("%s-%s\n", bmr.RealUrl, err.Error())
+					continue
+				}
+				if _, ok := csis[sdomain]; ok {
+					continue
+				}
+				si, err := site_base.ParseWebSeoFromUrl(bmr.RealUrl)
+				if err != nil {
+					fmt.Printf("%s-%s\n", bmr.RealUrl, err.Error())
+					continue
+				}
+
+				si5118, err := domain.GetDomainInfo(sdomain, 1)
+				if err != nil {
+					fmt.Printf("%s-%s\n", bmr.RealUrl, err.Error())
+					continue
+				}
+				csi := CatSiteInfo{SitePageInfo: *si, SearchKeyword: k, SiteUrl: bmr.RealUrl, SeoInfo5118: si5118, SiteDomain: sdomain}
+
+				csi.Keywords = append(csi.SitePageInfo.SpiltKeywordsStr2Arr())
+				//sKeywords = append(sKeywords,csi.SitePageInfo.SpiltKeywordsStr2Arr()...)
+				for _, r58 := range csi.SeoInfo5118.BaiduPCResult {
+					csi.Keywords = append(csi.Keywords, r58.Keyword)
+				}
+				sKeywords = append(sKeywords, csi.Keywords...)
+				csis[sdomain] = csi
+			}
+		}
+
+	}
+	countKeyword(sKeywords)
+	return sKeywords
+}
+func formatString(s string) string {
+	s = strings.Replace(s, "\n", "", -1)
+	s = strings.Replace(s, "\t", "", -1)
+	s = strings.Replace(s, "\r", "", -1)
+	s = strings.Replace(s, ",", "", -1)
+	s = strings.Replace(s, "\"", "", -1)
+	s = strings.Replace(s, " ", "", -1)
+	s = strings.Replace(s, "'", "", -1)
+	return s
 }

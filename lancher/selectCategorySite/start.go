@@ -151,7 +151,7 @@ func SelectKeywords() []string {
 }
 
 func run(keywords []string) []string {
-	sKeywords := []string{}
+	var sKeywords []string
 	l := len(keywords)
 	for i, k := range keywords {
 		if _, ok := keywordSearchCount[k]; ok {
@@ -182,7 +182,7 @@ func run(keywords []string) []string {
 					continue
 				}
 
-				si5118, err := domain.GetDomainInfo(sdomain)
+				si5118, err := domain.GetDomainInfo(sdomain, 1)
 				if err != nil {
 					fmt.Printf("%s-%s\n", bmr.RealUrl, err.Error())
 					continue
