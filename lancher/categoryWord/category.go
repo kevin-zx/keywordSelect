@@ -5,11 +5,14 @@ import (
 	"fmt"
 	"github.com/kevin-zx/baiduApiSDK/apiUtil"
 	"github.com/kevin-zx/baiduApiSDK/baiduSDK"
+	"github.com/kevin-zx/go-util/fileUtil"
 	"github.com/kevin-zx/seotools/comm/baidu"
 	"github.com/kevin-zx/seotools/comm/site_base"
 	"github.com/kevin-zx/seotools/comm/urlhandler"
 	"jinzhunassist/domain"
 	"net/url"
+	"os"
+	"strconv"
 	"strings"
 )
 
@@ -28,9 +31,27 @@ type CatSiteInfo struct {
 }
 
 func main() {
+	siteDomain := "www.gametea.com"
+	rootWords := []string{"麻将游戏", "游戏大厅", "棋牌游戏", "斗牛", "双扣", "拼十", "斗地主"}
+	fileName := "data/" + siteDomain + ".csv"
+	var rfile *os.File
+	var err error
+	if !fileUtil.CheckFileIsExist(fileName) {
+		rfile, err = os.Create(fileName)
+		if err != nil {
+			panic(err)
+		}
+	} else {
+		rfile, err = os.OpenFile(fileName, os.O_RDWR, os.ModePerm)
+		if err != nil {
+			panic(err)
+		}
+	}
+	defer rfile.Close()
+	csvWriter := csv.NewWriter(rfile)
+
 	csis = make(map[string]CatSiteInfo)
 	keywordSearchCount = make(map[string]int)
-	rootWords := []string{"苏州房产"}
 	websites, err := GetMainWebByWords(rootWords)
 	if err != nil {
 		panic(err)
@@ -53,7 +74,7 @@ func main() {
 		allKeywords = append(allKeywords, fck.Word)
 	}
 	countKeyword(allKeywords)
-	topKeywordsMap := SelectTopKeywords(100)
+	topKeywordsMap := SelectTopKeywords(50)
 	var topKeywords []string
 	for k := range topKeywordsMap {
 		topKeywords = append(topKeywords, k)
@@ -61,8 +82,14 @@ func main() {
 	run(topKeywords)
 
 	for k, c := range keywordCount {
+		err := csvWriter.Write([]string{k, strconv.Itoa(c)})
+		if err != nil {
+			panic(err)
+		}
 		fmt.Println(k, "----------", c)
+
 	}
+	csvWriter.Flush()
 
 }
 
