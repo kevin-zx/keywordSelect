@@ -17,8 +17,9 @@ import (
 	"time"
 )
 
-func GetCategoryWords(siteDomain string, rootWords []string, apiKey5118 string) (err error) {
-	rq, rfile, err := createFile(siteDomain)
+func GetCategoryWords(siteDomain string, rootWords []string, apiKey5118 string) (fileName string, err error) {
+	fileName = "./" + siteDomain + "_cateWords.csv"
+	rq, rfile, err := createFile(fileName)
 	if err != nil {
 		return
 	}
@@ -172,8 +173,8 @@ func GetKeywordsFromWebUrl(taskChannel chan string, resultChannel chan []string)
 
 }
 
-func createFile(siteDomain string) (recentQuery bool, rFile *os.File, err error) {
-	fileName := "./" + siteDomain + "_cateWords.csv"
+func createFile(fileName string) (recentQuery bool, rFile *os.File, err error) {
+
 	if !fileUtil.CheckFileIsExist(fileName) {
 		rFile, err = os.Create(fileName)
 		if err != nil {
