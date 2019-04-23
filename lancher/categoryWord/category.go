@@ -18,7 +18,6 @@ import (
 
 var keywordCount map[string]int
 var csis map[string]CatSiteInfo
-var csvW *csv.Writer
 var keywordSearchCount map[string]int
 
 type CatSiteInfo struct {
@@ -51,6 +50,7 @@ func main() {
 	csvWriter := csv.NewWriter(rfile)
 
 	csis = make(map[string]CatSiteInfo)
+
 	keywordSearchCount = make(map[string]int)
 	websites, err := GetMainWebByWords(rootWords)
 	if err != nil {
