@@ -193,7 +193,7 @@ func createFile(fileName string) (recentQuery bool, rFile *os.File, err error) {
 		hour := timeSub(finfo.ModTime(), time.Now())
 		if hour < 10 {
 			recentQuery = true
-			fmt.Println("最近10个小时内已经查过了", siteDomain, "的行业词了")
+			fmt.Println("最近10个小时内已经查过了", fileName, "的行业词了")
 			return
 		}
 
