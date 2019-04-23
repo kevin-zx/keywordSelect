@@ -48,7 +48,7 @@ func GetCategoryWords(siteDomain string, rootWords []string, apiKey5118 string) 
 	// 从meta获取关键词
 	webKeywords := GetSiteKeywords(webSites)
 	// 从5118获取关键词
-	webKeywords5118 := Get5118Keywords(webSites)
+	webKeywords5118 := Get5118Keywords(webSites, apiKey5118)
 	// 关键词集合起来
 	allKeywords = append(allKeywords, webKeywords5118...)
 	allKeywords = append(allKeywords, webKeywords...)
@@ -58,7 +58,7 @@ func GetCategoryWords(siteDomain string, rootWords []string, apiKey5118 string) 
 	for k := range topKeywordsMap {
 		topKeywords = append(topKeywords, k)
 	}
-	run(topKeywords, &keywordCount, 4)
+	run(topKeywords, &keywordCount, 4, apiKey5118)
 	for k, c := range keywordCount {
 		err := csvWriter.Write([]string{k, strconv.Itoa(c)})
 		if err != nil {
@@ -260,14 +260,14 @@ func GetSiteKeywords(websites []string) (keywords []string) {
 	return
 }
 
-func Get5118Keywords(websites []string) (keywords []string) {
+func Get5118Keywords(websites []string, apiKey5118 string) (keywords []string) {
 	for _, wurlStr := range websites {
 		wurl, err := url.Parse(wurlStr)
 		if err != nil {
 			continue
 		}
 		siteDomain := wurl.Host
-		si, err := domain.GetDomainInfo(siteDomain, 1)
+		si, err := domain.GetDomainInfo(siteDomain, 1, apiKey5118)
 		if err != nil {
 			continue
 		}
@@ -278,7 +278,7 @@ func Get5118Keywords(websites []string) (keywords []string) {
 		}
 		totalPage := si.TotalPage
 		for page := 2; page < totalPage && page <= 5; page++ {
-			si, err = domain.GetDomainInfo(siteDomain, page)
+			si, err = domain.GetDomainInfo(siteDomain, page, apiKey5118)
 			if err != nil {
 				continue
 			}
