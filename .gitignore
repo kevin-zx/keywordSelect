@@ -15,3 +15,4 @@
 data/*
 go.sum
 .idea/
+launcher/*

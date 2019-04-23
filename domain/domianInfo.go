@@ -26,10 +26,10 @@ type SeoInfo struct {
 	TotalPage     int
 }
 
-func GetDomainInfo(domain string, page int) (si SeoInfo, err error) {
+func GetDomainInfo(domain string, page int, appKey string) (si SeoInfo, err error) {
 	si = SeoInfo{}
 	time.Sleep(500 * time.Millisecond)
-	psResults, t, err := api_5118.ExportBaiduPcSearchResults(domain, page, "FF9853E8CCB04E06902F54A047BBE453")
+	psResults, t, err := api_5118.ExportBaiduPcSearchResults(domain, page, appKey)
 	if err != nil && err.Error() == "暂无数据" {
 		return
 	}

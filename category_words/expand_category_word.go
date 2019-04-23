@@ -17,16 +17,7 @@ import (
 	"time"
 )
 
-type CatSiteInfo struct {
-	SearchKeyword string
-	SiteDomain    string
-	SiteUrl       string
-	SitePageInfo  site_base.WebPageSeoInfo
-	SeoInfo5118   domain.SeoInfo
-	Keywords      []string
-}
-
-func GetCategoryWords(siteDomain string, rootWords []string) (err error) {
+func GetCategoryWords(siteDomain string, rootWords []string, apiKey5118 string) (err error) {
 	rq, rfile, err := createFile(siteDomain)
 	if err != nil {
 		return
@@ -93,7 +84,7 @@ func countKeyword(ks []string, keywordCount *map[string]int) {
 	}
 }
 
-func run(keywords []string, keywordCount *map[string]int, parallelismCount int) {
+func run(keywords []string, keywordCount *map[string]int, parallelismCount int, appkey string) {
 
 	siteDomains := []string{}
 	siteUrls := []string{}
@@ -128,7 +119,7 @@ func run(keywords []string, keywordCount *map[string]int, parallelismCount int) 
 	siteUrls = site_base.RemoveDuplicatesAndEmpty(siteUrls)
 	for i, sdomain := range siteDomains {
 		fmt.Println("domain 5118 keywords get:", i, "/", len(siteDomains))
-		si5118, err := domain.GetDomainInfo(sdomain, 1)
+		si5118, err := domain.GetDomainInfo(sdomain, 1, appkey)
 		if err != nil {
 			fmt.Printf("%s-%s\n", sdomain, err.Error())
 			continue
