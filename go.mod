@@ -1,4 +1,4 @@
-module jinzhunassist
+module github.com/kevin-zx/keywordSelect
 
 require (
 	github.com/kevin-zx/baiduApiSDK v0.0.0-20190421101938-aca48f68c354
