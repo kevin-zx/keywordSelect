@@ -18,8 +18,9 @@ import (
 )
 
 func GetCategoryWords(siteDomain string, rootWords []string, apiKey5118 string) (fileName string, err error) {
-	fileName = "./" + siteDomain + "_cateWords.csv"
-	rq, rfile, err := createFile(fileName)
+	fileName = "./" + strings.Replace(siteDomain, ".", "_", -1) + "/cateWords.csv"
+	path := strings.Replace(siteDomain, ".", "_", -1)
+	rq, rfile, err := createFile(path, fileName)
 	if err != nil {
 		return
 	}
@@ -173,7 +174,18 @@ func GetKeywordsFromWebUrl(taskChannel chan string, resultChannel chan []string)
 
 }
 
-func createFile(fileName string) (recentQuery bool, rFile *os.File, err error) {
+func createFile(path string, fileName string) (recentQuery bool, rFile *os.File, err error) {
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		// 必须分成两步：先创建文件夹、再修改权限
+		err = os.Mkdir(path, 0777) //0777也可以os.ModePerm
+		if err != nil {
+			return
+		}
+		err = os.Chmod(path, 0777)
+		if err != nil {
+			return
+		}
+	}
 
 	if !fileUtil.CheckFileIsExist(fileName) {
 		rFile, err = os.Create(fileName)
