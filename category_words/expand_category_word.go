@@ -175,7 +175,7 @@ func GetKeywordsFromWebUrl(taskChannel chan string, resultChannel chan []string)
 }
 
 func createFile(path string, fileName string) (recentQuery bool, rFile *os.File, err error) {
-	if _, err := os.Stat(path); os.IsNotExist(err) {
+	if _, err = os.Stat(path); os.IsNotExist(err) {
 		// 必须分成两步：先创建文件夹、再修改权限
 		err = os.Mkdir(path, 0777) //0777也可以os.ModePerm
 		if err != nil {
