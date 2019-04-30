@@ -31,10 +31,6 @@ func GetCategoryWords(siteDomain string, rootWords []string, apiKey5118 string) 
 
 	csvWriter := csv.NewWriter(rfile)
 	keywordCount := make(map[string]int)
-	webSites, err := GetCategoryWebSite(rootWords)
-	if err != nil {
-		return
-	}
 
 	var allKeywords []string
 	// 从凤巢拓词
@@ -47,8 +43,13 @@ func GetCategoryWords(siteDomain string, rootWords []string, apiKey5118 string) 
 			allKeywords = append(allKeywords, fck.Word)
 		}
 	}
+	webSites, err := GetCategoryWebSite(site_base.RemoveDuplicatesAndEmpty(allKeywords))
+	if err != nil {
+		return
+	}
 	// 从meta获取关键词
 	webKeywords := GetSiteKeywords(webSites)
+
 	// 从5118获取关键词
 	webKeywords5118 := Get5118Keywords(webSites, apiKey5118)
 	// 关键词集合起来
@@ -240,7 +241,7 @@ func GetCategoryWebSite(rootWords []string) (webSites []string, err error) {
 	for _, sr := range srs {
 		webSites = append(webSites, sr.RealUrl)
 	}
-
+	webSites = site_base.RemoveDuplicatesAndEmpty(webSites)
 	return
 }
 
