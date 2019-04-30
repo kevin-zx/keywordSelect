@@ -43,7 +43,7 @@ func GetCategoryWords(siteDomain string, rootWords []string, apiKey5118 string) 
 			allKeywords = append(allKeywords, fck.Word)
 		}
 	}
-	webSites, err := GetCategoryWebSite(site_base.RemoveDuplicatesAndEmpty(allKeywords))
+	webSites, err := GetCategoryWebSite(site_base.RemoveDuplicatesAndEmpty(allKeywords)[0:30])
 	if err != nil {
 		return
 	}
