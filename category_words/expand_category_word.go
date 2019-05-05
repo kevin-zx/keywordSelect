@@ -37,7 +37,7 @@ func GetCategoryWords(siteDomain string, rootWords []string, apiKey5118 string) 
 	for _, rs := range rootWords {
 		fengChaoKeywords, err := GetBaiduFengchaoKeywords(rs)
 		if err != nil {
-			panic(err)
+			continue
 		}
 		for _, fck := range *fengChaoKeywords {
 			allKeywords = append(allKeywords, fck.Word)
