@@ -48,6 +48,7 @@ func GetCategoryWords(siteDomain string, rootWords []string, apiKey5118 string) 
 	if err != nil {
 		return
 	}
+	allKeywords = append(allKeywords, rootWords...)
 	countKeyword(allKeywords, &keywordCount)
 	tk := SelectTopKeywords(30, &keywordCount)
 	var sks []string
@@ -60,6 +61,7 @@ func GetCategoryWords(siteDomain string, rootWords []string, apiKey5118 string) 
 		return
 	}
 	webSites = append(webSites, webSites2...)
+	webSites = site_base.RemoveDuplicatesAndEmpty(webSites)
 	// 从meta获取关键词
 	webKeywords := GetSiteKeywords(webSites)
 
