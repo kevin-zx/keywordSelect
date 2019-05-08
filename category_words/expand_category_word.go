@@ -44,10 +44,22 @@ func GetCategoryWords(siteDomain string, rootWords []string, apiKey5118 string) 
 			allKeywords = append(allKeywords, fck.Word)
 		}
 	}
-	webSites, err := GetCategoryWebSite(site_base.RemoveDuplicatesAndEmpty(allKeywords)[0:30])
+	webSites, err := GetCategoryWebSite(rootWords)
 	if err != nil {
 		return
 	}
+	countKeyword(allKeywords, &keywordCount)
+	tk := SelectTopKeywords(30, &keywordCount)
+	var sks []string
+	for k, _ := range tk {
+		sks = append(sks, k)
+	}
+	webSites2, err := GetCategoryWebSite(sks)
+
+	if err != nil {
+		return
+	}
+	webSites = append(webSites, webSites2...)
 	// 从meta获取关键词
 	webKeywords := GetSiteKeywords(webSites)
 
