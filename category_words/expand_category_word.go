@@ -7,6 +7,7 @@ import (
 	"github.com/kevin-zx/baiduApiSDK/baiduSDK"
 	"github.com/kevin-zx/go-util/fileUtil"
 	"github.com/kevin-zx/keywordSelect/domain"
+	"github.com/kevin-zx/seotools/api_5118"
 	"github.com/kevin-zx/seotools/comm/baidu"
 	"github.com/kevin-zx/seotools/comm/site_base"
 	"github.com/kevin-zx/seotools/comm/urlhandler"
@@ -17,7 +18,7 @@ import (
 	"time"
 )
 
-func GetCategoryWords(siteDomain string, rootWords []string, apiKey5118 string) (fileName string, err error) {
+func GetCategoryWords(siteDomain string, rootWords []string, domainKeywordApiKey5118 string, longwordApiKey5118 string) (fileName string, err error) {
 	fileName = "./" + strings.Replace(siteDomain, ".", "_", -1) + "/cateWords.csv"
 	path := strings.Replace(siteDomain, ".", "_", -1)
 	rq, rfile, err := createFile(path, fileName)
@@ -36,13 +37,24 @@ func GetCategoryWords(siteDomain string, rootWords []string, apiKey5118 string) 
 	// 从凤巢拓词
 	for _, rs := range rootWords {
 		fengChaoKeywords, err := GetBaiduFengchaoKeywords(rs)
+
 		if err != nil {
 			fmt.Println(err.Error())
-			continue
+		} else {
+			for _, fck := range *fengChaoKeywords {
+				allKeywords = append(allKeywords, fck.Word)
+			}
 		}
-		for _, fck := range *fengChaoKeywords {
-			allKeywords = append(allKeywords, fck.Word)
+
+		lws, _, err := api_5118.GetLongWordByKeyword(rs, 1, 1000, longwordApiKey5118)
+		if err != nil {
+			fmt.Println(err.Error())
+		} else {
+			for _, lw := range *lws {
+				allKeywords = append(allKeywords, lw.Keyword)
+			}
 		}
+
 	}
 	allKeywords = append(allKeywords, rootWords...)
 	countKeyword(allKeywords, &keywordCount)
@@ -66,7 +78,7 @@ func GetCategoryWords(siteDomain string, rootWords []string, apiKey5118 string) 
 	webKeywords := GetSiteKeywords(webSites)
 
 	// 从5118获取关键词
-	webKeywords5118 := Get5118Keywords(webSites, apiKey5118)
+	webKeywords5118 := Get5118Keywords(webSites, domainKeywordApiKey5118)
 	// 关键词集合起来
 	allKeywords = append(allKeywords, webKeywords5118...)
 	allKeywords = append(allKeywords, webKeywords...)
@@ -76,7 +88,7 @@ func GetCategoryWords(siteDomain string, rootWords []string, apiKey5118 string) 
 	for k := range topKeywordsMap {
 		topKeywords = append(topKeywords, k)
 	}
-	run(topKeywords, &keywordCount, 4, apiKey5118)
+	run(topKeywords, &keywordCount, 4, domainKeywordApiKey5118)
 	for k, c := range keywordCount {
 		err := csvWriter.Write([]string{k, strconv.Itoa(c)})
 		if err != nil {
