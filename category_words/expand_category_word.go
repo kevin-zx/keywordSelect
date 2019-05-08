@@ -44,19 +44,19 @@ func GetCategoryWords(siteDomain string, rootWords []string, apiKey5118 string) 
 			allKeywords = append(allKeywords, fck.Word)
 		}
 	}
+	allKeywords = append(allKeywords, rootWords...)
+	countKeyword(allKeywords, &keywordCount)
 	webSites, err := GetCategoryWebSite(rootWords)
 	if err != nil {
 		return
 	}
-	allKeywords = append(allKeywords, rootWords...)
-	countKeyword(allKeywords, &keywordCount)
 	tk := SelectTopKeywords(30, &keywordCount)
 	var sks []string
 	for k, _ := range tk {
 		sks = append(sks, k)
 	}
-	webSites2, err := GetCategoryWebSite(sks)
 
+	webSites2, err := GetCategoryWebSite(sks)
 	if err != nil {
 		return
 	}
