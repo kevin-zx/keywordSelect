@@ -256,7 +256,10 @@ func GetCategoryWebSite(rootWords []string) (webSites []string, err error) {
 		var rs *[]baidu.SearchResult
 		rs, err = baidu.GetBaiduPcResultsByKeyword(rk, 1, 50)
 		if err != nil {
-			return
+			rs, err = baidu.GetBaiduPcResultsByKeyword(rk, 1, 50)
+			if err != nil {
+				continue
+			}
 		}
 		for _, r := range *rs {
 			if r.IsHomePage() && r.RealUrl != "" && !strings.Contains(r.RealUrl, "baidu") {
