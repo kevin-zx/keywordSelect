@@ -11,6 +11,7 @@ import (
 	"github.com/kevin-zx/seotools/comm/baidu"
 	"github.com/kevin-zx/seotools/comm/site_base"
 	"github.com/kevin-zx/seotools/comm/urlhandler"
+	"github.com/kevin-zx/seotools/expandWords/BaiduWordExpand"
 	"net/url"
 	"os"
 	"strconv"
@@ -34,8 +35,8 @@ func GetCategoryWords(siteDomain string, rootWords []string, domainKeywordApiKey
 	keywordCount := make(map[string]int)
 
 	var allKeywords []string
-	// 从凤巢拓词
 	for _, rs := range rootWords {
+		// 从凤巢拓词
 		fengChaoKeywords, err := GetBaiduFengchaoKeywords(rs)
 
 		if err != nil {
@@ -45,7 +46,7 @@ func GetCategoryWords(siteDomain string, rootWords []string, domainKeywordApiKey
 				allKeywords = append(allKeywords, fck.Word)
 			}
 		}
-
+		// 从5118拓词
 		lws, _, err := api_5118.GetLongWordByKeyword(rs, 1, 1000, longwordApiKey5118)
 		if err != nil {
 			fmt.Println(err.Error())
@@ -54,7 +55,15 @@ func GetCategoryWords(siteDomain string, rootWords []string, domainKeywordApiKey
 				allKeywords = append(allKeywords, lw.Keyword)
 			}
 		}
-
+		// 从百度mobile拓词
+		ks, err := BaiduWordExpand.ExpandBaiduRecommendWords(rs)
+		if err != nil {
+			fmt.Println(err.Error())
+		} else {
+			for _, k := range ks {
+				allKeywords = append(allKeywords, k)
+			}
+		}
 	}
 	allKeywords = append(allKeywords, rootWords...)
 	countKeyword(allKeywords, &keywordCount)
