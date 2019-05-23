@@ -62,6 +62,7 @@ func GetCategoryWords(siteDomain string, rootWords []string, domainKeywordApiKey
 		} else {
 			ks = site_base.RemoveDuplicatesAndEmpty(ks)
 			for _, k := range ks {
+				fmt.Println(k)
 				allKeywords = append(allKeywords, k)
 			}
 		}
