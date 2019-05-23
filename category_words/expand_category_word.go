@@ -58,6 +58,9 @@ func GetCategoryWords(siteDomain string, rootWords []string, domainKeywordApiKey
 		// 从百度mobile拓词
 		ks, err := BaiduWordExpand.ExpandBaiduRecommendWords(rs)
 		if err != nil {
+			ks, err = BaiduWordExpand.ExpandBaiduRecommendWords(rs)
+		}
+		if err != nil {
 			fmt.Println(err.Error())
 		} else {
 			ks = site_base.RemoveDuplicatesAndEmpty(ks)
